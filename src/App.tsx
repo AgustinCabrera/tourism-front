@@ -1,10 +1,12 @@
 import './App.css';
+import UserList from './users/userList';
 
 function App() {
   return (
     <div className="App">
-      <h1>Hello</h1>
+      <UserList />
     </div>
   );
 }
+
 export default App;

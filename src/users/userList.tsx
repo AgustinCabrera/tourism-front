@@ -1,5 +1,5 @@
     import React, { useState, useEffect } from 'react';
-    import { IUser } from '../types'
+    import { IUser } from './types';
 
     const UserList: React.FC = () => {
     const [users, setUsers] = useState<IUser[]>([]);
@@ -9,13 +9,19 @@
     useEffect(() => {
         const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/users/');
+            const response = await fetch('http://localhost:3000/users/getUsers');
             if (!response.ok) {
             throw new Error('Network response was not ok');
             }
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
             const data: IUser[] = await response.json();
             setUsers(data);
-        } catch (error) {
+            } else {
+            const text = await response.text();
+            throw new Error(`Unexpected response format: ${text}`);
+            }
+        } catch (error: any) {
             setError(error.message);
         } finally {
             setLoading(false);
@@ -23,6 +29,7 @@
         };
 
         fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (loading) {
@@ -37,9 +44,9 @@
         <div>
         <h1>User List</h1>
         <ul>
-        {users.map(user => (
+            {users.map(user => (
             <li key={user.username}>
-                {user.username} ({user.gold})({user.available_time}) ({user.preferred_attraction_type_id})({user.is_admin})
+                {user.username} ({user.gold}) ({user.available_time}) ({user.preferred_attraction_type_id}) ({user.is_admin})
             </li>
             ))}
         </ul>
